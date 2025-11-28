@@ -167,7 +167,7 @@ CMD ["http-server", "dist/angular-15-crud", "-p", "8081"]
 
 ```bash
 docker build -t mern-frontend .
-docker run -itd --name frontend -p 8081:8081 mern-frontend:latest
+docker run -itd --name frontend --network mern -p 8081:8081 mern-frontend:latest
 ```
 
 > Open your browser and navigate to `http://<AWS-IP>:8081` to verify the frontend is working.
