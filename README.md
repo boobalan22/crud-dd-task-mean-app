@@ -454,7 +454,7 @@ pipeline {
 
 ---
 
-## **Step 5: How It Works (Simple English)**
+## **Step 5: How It Works **
 
 1. **Checkout Code** → Pulls the latest code from GitHub.
 2. **Build Docker Images** → Builds backend & frontend images.
@@ -464,7 +464,8 @@ pipeline {
 
 ---
 
-This pipeline provides a **fully automated CI/CD process** for the MEAN stack application with **Docker and Jenk
+This pipeline provides a **fully automated CI/CD process** for the MEAN stack application with **Docker and Jenkins**
+
 <img width="1919" height="970" alt="Screenshot 2025-11-28 163143" src="https://github.com/user-attachments/assets/67054f46-42dd-475f-954c-cd4b8e23ecd2" />
 
 # Nginx Reverse Proxy for MEAN App
