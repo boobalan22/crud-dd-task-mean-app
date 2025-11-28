@@ -9,7 +9,7 @@ import { Tutorial } from '../models/tutorial.model';
 export class TutorialService {
 
   // Use backend container name for Docker networking
-  baseUrl = 'http://backend:8080/api/tutorials';
+  baseUrl = 'http://34.229.120.78:8080/api/tutorials';
 
   constructor(private http: HttpClient) { }
 
