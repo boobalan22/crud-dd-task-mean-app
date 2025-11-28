@@ -575,4 +575,9 @@ Open your browser and go to `http://<EC2-IP>` to verify that:
 
 <img width="1916" height="968" alt="Screenshot 2025-11-28 170744" src="https://github.com/user-attachments/assets/eb53de5d-ce46-452d-bc1f-7ec713848ee6" />
 
+##Output-4:
+
+<img width="1919" height="974" alt="Output-4" src="https://github.com/user-attachments/assets/6cd66d2a-906b-4271-b838-c565a446be4b" />
+
+
 
