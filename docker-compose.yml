@@ -1,41 +1,31 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  mongodb:
+  mongo:
     image: mongo
-    container_name: mongodb
+    container_name: mongo
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-    networks:
-      - mean-network   # <-- add this
 
   backend:
-    build: ./backend
+    image: boobu/backend-mean
     container_name: backend
     ports:
       - "8080:8080"
-    environment:
-      - MONGO_URL=mongodb://mongodb:27017/dd_db
     depends_on:
-      - mongodb
-    networks:
-      - mean-network   # already present
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/dd_db
 
   frontend:
-    build: ./frontend
+    image: boobu/frontend-mean
     container_name: frontend
     ports:
-      - "8081:8081"
+      - "80:80"
     depends_on:
       - backend
-    networks:
-      - mean-network
 
 volumes:
   mongo-data:
-
-networks:
-  mean-network:
-  
