@@ -1,10 +1,19 @@
-FROM node:18
+FROM node:18 as builder
+
 WORKDIR /app
-RUN npm install -g @angular/cli
+
 COPY package*.json ./
+
 RUN npm install
+
 COPY . .
-RUN ng build --configuration production
-RUN npm install -g http-server
-EXPOSE 8081
-CMD ["http-server", "dist/angular-15-crud", "-p", "8081"]
+
+RUN npm run build --prod
+
+FROM nginx:alpine
+
+COPY --from=builder /app/dist/angular-15-crud /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
