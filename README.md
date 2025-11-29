@@ -563,21 +563,17 @@ Open your browser and go to `http://<EC2-IP>` to verify that:
 * The Angular frontend loads.
 * API calls to `/api/` route correctly to the backend.
 
-##Output-1:
+##Output:
 
 <img width="1919" height="968" alt="Screenshot 2025-11-28 170623" src="https://github.com/user-attachments/assets/72b68920-bd9c-478b-8a4a-7d5d53c0a30a" />
 
-##Output-2:
-
 <img width="1919" height="968" alt="Screenshot 2025-11-28 170723" src="https://github.com/user-attachments/assets/daf9f98b-e388-486f-9687-c099e90160b8" />
-
-##Output-3:
 
 <img width="1916" height="968" alt="Screenshot 2025-11-28 170744" src="https://github.com/user-attachments/assets/eb53de5d-ce46-452d-bc1f-7ec713848ee6" />
 
-##Output-4:
-
 <img width="1919" height="974" alt="Output-4" src="https://github.com/user-attachments/assets/6cd66d2a-906b-4271-b838-c565a446be4b" />
+
+<img width="1919" height="971" alt="Output-5" src="https://github.com/user-attachments/assets/69a215f4-c033-403d-b1c8-8ffba86992b5" />
 
 
 
