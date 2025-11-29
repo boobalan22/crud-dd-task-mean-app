@@ -6,6 +6,18 @@ This repository contains a **full-stack MEAN (MongoDB, Express, Angular, Node.js
 Website URL - http://34.229.120.78/
 ---
 
+# Jenkins CI/CD Pipeline for MEAN App Deployment
+
+<img width="1919" height="1016" alt="image" src="https://github.com/user-attachments/assets/20f65d4b-3c8b-4f50-8071-5c6a559df3e2" />
+
+# Running Images and Containers
+
+<img width="1732" height="291" alt="image" src="https://github.com/user-attachments/assets/46d4b809-e5a7-4ca9-9a22-3588d6037029" />
+
+# DockerHub
+
+<img width="1568" height="428" alt="image" src="https://github.com/user-attachments/assets/460b9a74-d31b-4539-af36-4bff916927ae" />
+
 ## **Infrastructure Setup (AWS)**
 
 **Instance Configuration:**
@@ -22,9 +34,10 @@ Website URL - http://34.229.120.78/
 | 80    | HTTP                 |
 | 443   | HTTPS                |
 | 8080  | Backend API          |
-| 8081  | Frontend Angular App |
-| 9090  | Optional Monitoring  |
+| 9090  | Jenkins              |
 | 27017 | MongoDB              |
+
+<img width="1916" height="867" alt="image" src="https://github.com/user-attachments/assets/3d4fc7b4-70c2-48ee-8a74-c6f2b4579434" />
 
 ---
 
@@ -49,92 +62,24 @@ docker-compose --version
 
 ---
 
-## **Application Configuration**
-
-### **Backend (Node.js + Express)**
-
-1. **Update MongoDB Connection**
-
-Edit `backend/app/config/db.config.js`:
-
-```javascript
-// Original
-module.exports = {
-  url: "mongodb://localhost:27017/dd_db"
-};
-
-// Updated for Docker networking
-module.exports = {
-  url: "mongodb://mongodb:27017/dd_db"
-};
-```
-
-2. **Enable CORS in `server.js`**
-
-```javascript
-const express = require("express");
-const cors = require("cors");  // Add this
-
-const app = express();
-
-app.use(cors()); // Add this
-```
-
----
-
-### **Frontend (Angular)**
-
-Edit `frontend/src/app/services/tutorial.service.ts`:
-
-```typescript
-// Replace <ENTER-IP> with your AWS public IP
-const baseUrl = 'http://<ENTER-IP>:8080/api/tutorials';
-```
-
----
-
 ## **Docker Setup**
-
-### **Create Docker Network**
-
-```bash
-docker network create mern
-```
-
----
-
-### **MongoDB Container**
-
-```bash
-docker run -d --name mongodb --network mern -p 27017:27017 mongo:latest
-```
-
----
-
-### **Backend Container**
 
 **Dockerfile (backend/Dockerfile):**
 
 ```dockerfile
 FROM node:18
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package.json ./
+COPY package*.json ./
+
 RUN npm install
 
 COPY . .
 
 EXPOSE 8080
 
-CMD ["npm", "start"]
-```
-
-**Build and Run Backend:**
-
-```bash
-docker build -t mern-backend .
-docker run -itd --name backend --network mern -p 8080:8080 mern-backend:latest
+CMD ["node", "server.js"]
 ```
 
 ---
@@ -144,33 +89,26 @@ docker run -itd --name backend --network mern -p 8080:8080 mern-backend:latest
 **Dockerfile (frontend/Dockerfile):**
 
 ```dockerfile
-FROM node:18
+FROM node:18 as builder
 
 WORKDIR /app
 
-RUN npm install -g @angular/cli
-
 COPY package*.json ./
+
 RUN npm install
 
 COPY . .
 
-RUN ng build --configuration production
-RUN npm install -g http-server
+RUN npm run build --prod
 
-EXPOSE 8081
+FROM nginx:alpine
 
-CMD ["http-server", "dist/angular-15-crud", "-p", "8081"]
+COPY --from=builder /app/dist/angular-15-crud /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
 ```
-
-**Build and Run Frontend:**
-
-```bash
-docker build -t mern-frontend .
-docker run -itd --name frontend --network mern -p 8081:8081 mern-frontend:latest
-```
-
-> Open your browser and navigate to `http://<AWS-IP>:8081` to verify the frontend is working.
 
 ---
 
@@ -179,57 +117,64 @@ docker run -itd --name frontend --network mern -p 8081:8081 mern-frontend:latest
 **docker-compose.yml:**
 
 ```yaml
-version: '3'
+version: '3.8'
 
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
+  mongo:
+    image: mongo
+    container_name: mongo
     ports:
       - "27017:27017"
-    networks:
-      - mern
+    volumes:
+      - mongo-data:/data/db
 
   backend:
-    build: ./backend
+    image: boobu/backend-mean
     container_name: backend
     ports:
       - "8080:8080"
-    networks:
-      - mern
     depends_on:
-      - mongodb
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/dd_db
 
   frontend:
-    build: ./frontend
+    image: boobu/frontend-mean
     container_name: frontend
     ports:
-      - "8081:8081"
-    networks:
-      - mern
+      - "80:80"
     depends_on:
       - backend
 
-networks:
-  mern:
-    driver: bridge
-```
-
-**Commands:**
-
-```bash
-docker compose up -d --build
-docker compose down
+volumes:
+  mongo-data:
 ```
 
 ---
+# Nginx setup
+## nginx.config
 
-## **Check Application**
+```config
+server {
+    listen 80;
+    server_name localhost;
 
-1. MongoDB running: `docker ps | grep mongodb`
-2. Backend running: `docker ps | grep backend`
-3. Frontend running: `docker ps | grep frontend`
-4. Access Angular fronten
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://backend:8080/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
 
 # Jenkins CI/CD Pipeline for MEAN App Deployment
 
@@ -379,7 +324,9 @@ Navigate to: `Manage Jenkins → Credentials → System → Global credentials �
 ## **Step 3: Create a Jenkins Pipeline Job**
 
 1. Click **New Item → Pipeline → OK**
-2. Pipeline → Definition → Pipeline script
+2. Pipeline → Definition → Pipeline script from SCM
+
+<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/3b31a82e-92bf-4c25-82a3-e037fe2a36a8" />
 
 ---
 
@@ -395,63 +342,61 @@ This pipeline automates the following steps:
 ```groovy
 pipeline {
     agent any
-
-    environment {
-        DOCKERHUB = credentials('dockerhub-creds')
-        DOCKERHUB_USER = "${DOCKERHUB_USR}"
-        DOCKERHUB_PASS = "${DOCKERHUB_PSW}"
-
-        FRONTEND_IMG = "${DOCKERHUB_USR}/frontend"
-        BACKEND_IMG  = "${DOCKERHUB_USR}/backend"
-    }
-
     stages {
-        stage('Clone Code') {
+        stage('Build Backend Docker Image') {
             steps {
-                git branch: 'main', url: 'https://github.com/boobalan22/crud-dd-task-mean-app.git'
+                dir('backend') {
+                    sh """
+                        docker rmi -f boobu/backend-mean || true
+                        docker build -t boobu/backend-mean .
+                    """
+                }
             }
         }
 
-        stage('Build Images') {
+        stage('Build Frontend Docker Image') {
+            steps {
+                dir('frontend') {
+                    sh """
+                        docker rmi -f boobu/frontend-mean || true
+                        docker build -t boobu/frontend-mean .
+                    """
+                }
+            }
+        }
+
+        stage("Push the Images to Docker Hub") { 
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+                        docker push $DOCKER_USER/frontend-mean
+                        docker push $DOCKER_USER/backend-mean
+
+                        docker logout
+                    """
+                }
+            }
+        }
+
+        stage('Run Docker Compose') {
             steps {
                 sh '''
-                docker build -t $FRONTEND_IMG:latest ./frontend
-                docker build -t $BACKEND_IMG:latest ./backend
+                    docker-compose down || true
+                    docker-compose up -d --build
                 '''
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Clean Dangling Images') {
             steps {
-                sh '''
-                echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
-                docker push $FRONTEND_IMG:latest
-                docker push $BACKEND_IMG:latest
-                '''
-            }
-        }
-
-        stage('Deploy on AWS VM') {
-            steps {
-                sh '''
-                docker network create app-network || true
-                docker rm -f frontend backend mongo || true
-
-                docker run -d --name mongo --network app-network -p 27017:27017 mongo:latest
-
-                docker run -d --name backend --network app-network -p 8080:8080 \
-                    -e MONGO_URL=mongodb://mongo:27017/testdb \
-                    $BACKEND_IMG:latest
-
-                docker run -d --name frontend --network app-network -p 8081:8081 \
-                    $FRONTEND_IMG:latest
-                '''
+                sh 'docker image prune -f'
             }
         }
     }
 }
 ```
-
 ---
 
 ## **Step 5: How It Works **
@@ -459,90 +404,15 @@ pipeline {
 1. **Checkout Code** → Pulls the latest code from GitHub.
 2. **Build Docker Images** → Builds backend & frontend images.
 3. **Push Docker Images** → Pushes images to Docker Hub.
-4. **Deploy Containers** → Stops old containers, runs new ones with Docker.
-5. **Logout** → Logs out from Docker Hub.
+4. **Run Docker Compose** → Runs the Docker Container.
 
 ---
 
 This pipeline provides a **fully automated CI/CD process** for the MEAN stack application with **Docker and Jenkins**
 
-<img width="1919" height="970" alt="Screenshot 2025-11-28 163143" src="https://github.com/user-attachments/assets/67054f46-42dd-475f-954c-cd4b8e23ecd2" />
+<img width="1919" height="1016" alt="image" src="https://github.com/user-attachments/assets/4d222ae4-798e-4fbe-9a93-154ccda4db22" />
 
-# Nginx Reverse Proxy for MEAN App
 
-This guide sets up **Nginx as a reverse proxy** for the **CRUD-DD-TASK-MEAN-APP**. The entire application will be accessible via **port 80**. HTTPS and domain mapping are not required.
-
----
-
-## **Step 1: Create Nginx Configuration**
-
-Create a folder and the configuration file:
-
-```bash
-mkdir -p /opt/nginx
-nano /opt/nginx/default.conf
-```
-
-Paste the following content into `default.conf`:
-
-```nginx
-server {
-    listen 80;
-
-    # Frontend proxy
-    location / {
-        proxy_pass http://frontend:8081/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    # Backend API proxy
-    location /api/ {
-        proxy_pass http://backend:8080/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-This configuration ensures:
-
-* `/` routes to the Angular frontend.
-* `/api/` routes to the Node.js backend.
-
----
-
-## **Step 2: Run the Nginx Container**
-
-Run Nginx attached to your existing Docker network:
-
-```bash
-docker run -d \
-  --name nginx \
-  --network app-network \
-  -p 80:80 \
-  -v /opt/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro \
-  nginx:latest
-```
-
-**Explanation of flags:**
-
-| Flag                    | Purpose                                                                     |
-| ----------------------- | --------------------------------------------------------------------------- |
-| `--name nginx`          | Assigns a name to the container for easy reference                          |
-| `--network app-network` | Connects Nginx to the Docker network to communicate with frontend & backend |
-| `-p 80:80`              | Exposes Nginx on port 80 of the EC2 instance                                |
-| `-v ...`                | Mounts the local configuration file into the container (read-only)          |
-
-After running this, your MEAN app will be accessible via `http://<EC2-IP>`.
-
----
 
 ### **Optional Verification**
 
@@ -552,11 +422,6 @@ Check running containers:
 docker ps
 ```
 
-Logs for Nginx:
-
-```bash
-docker logs -f nginx
-```
 
 Open your browser and go to `http://<EC2-IP>` to verify that:
 
@@ -574,6 +439,9 @@ Open your browser and go to `http://<EC2-IP>` to verify that:
 <img width="1919" height="974" alt="Output-4" src="https://github.com/user-attachments/assets/6cd66d2a-906b-4271-b838-c565a446be4b" />
 
 <img width="1919" height="971" alt="Output-5" src="https://github.com/user-attachments/assets/69a215f4-c033-403d-b1c8-8ffba86992b5" />
+
+<img width="1919" height="968" alt="image" src="https://github.com/user-attachments/assets/6ad0c13b-becf-4f8f-85cb-d46246d817ad" />
+
 
 
 
