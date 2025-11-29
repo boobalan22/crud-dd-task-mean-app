@@ -3,43 +3,40 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Tutorial } from '../models/tutorial.model';
 
+const baseUrl = '/api/tutorials';
+
 @Injectable({
   providedIn: 'root'
 })
 export class TutorialService {
 
-  // Use backend container name for Docker networking
-  baseUrl = 'http://34.229.120.78:8080/api/tutorials';
-
   constructor(private http: HttpClient) { }
 
-  create(data: any): Observable<any> {
-    return this.http.post(this.baseUrl, data);
-  }
-
   getAll(): Observable<Tutorial[]> {
-    return this.http.get<Tutorial[]>(this.baseUrl);
+    return this.http.get<Tutorial[]>(baseUrl);
   }
 
   get(id: any): Observable<Tutorial> {
-    return this.http.get<Tutorial>(`${this.baseUrl}/${id}`);
+    return this.http.get<Tutorial>(`${baseUrl}/${id}`);
+  }
+
+  create(data: any): Observable<any> {
+    return this.http.post(baseUrl, data);
   }
 
   update(id: any, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/${id}`, data);
+    return this.http.put(`${baseUrl}/${id}`, data);
   }
 
   delete(id: any): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete(`${baseUrl}/${id}`);
   }
 
-  // Add deleteAll to avoid production build error
   deleteAll(): Observable<any> {
-    return this.http.delete(this.baseUrl);
+    return this.http.delete(baseUrl);
   }
 
   findByTitle(title: any): Observable<Tutorial[]> {
-    return this.http.get<Tutorial[]>(`${this.baseUrl}?title=${title}`);
+    return this.http.get<Tutorial[]>(`${baseUrl}?title=${title}`);
   }
 }
-
