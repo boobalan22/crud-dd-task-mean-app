@@ -8,7 +8,8 @@ Website URL - http://34.229.120.78/
 
 # Jenkins CI/CD Pipeline for MEAN App Deployment
 
-<img width="745" height="378" alt="Screenshot 2025-11-29 185108" src="https://github.com/user-attachments/assets/a89480eb-fcfd-442b-8fc0-c15c24faa576" />
+<img width="1919" height="1016" alt="Jenkins pipeline" src="https://github.com/user-attachments/assets/8bb7400b-90c3-406b-a00a-297ddeea893c" />
+
 
 # Running Images and Containers
 
