@@ -3,13 +3,12 @@
 This repository contains a **full-stack MEAN (MongoDB, Express, Angular, Node.js) application** deployed using Docker on AWS. This setup was implemented as part of the **DevOps Engineer Intern Assignment**.
 
 ---
-Website URL - http://34.229.120.78/
+Website URL - http://3.236.13.12/
 ---
 
 # Jenkins CI/CD Pipeline for MEAN App Deployment
 
-<img width="1919" height="1016" alt="Jenkins pipeline" src="https://github.com/user-attachments/assets/8bb7400b-90c3-406b-a00a-297ddeea893c" />
-
+<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/590a840a-11b6-4546-b524-20ebe4c16f82" />
 
 # Running Images and Containers
 
@@ -23,9 +22,9 @@ Website URL - http://34.229.120.78/
 
 **Instance Configuration:**
 
-* **Instance Type:** `m7i-flex.large` (2 CPU, 8GB RAM)
+* **Instance Type:** `c7i-flex.large` (2 CPU, 4GB RAM)
 * **AMI:** `Ubuntu 22.04 LTS`
-* **Storage:** `20GB, gp3`
+* **Storage:** `15GB, gp3`
 
 **Inbound Rules (Security Group):**
 
@@ -38,7 +37,7 @@ Website URL - http://34.229.120.78/
 | 9090  | Jenkins              |
 | 27017 | MongoDB              |
 
-<img width="1916" height="867" alt="image" src="https://github.com/user-attachments/assets/3d4fc7b4-70c2-48ee-8a74-c6f2b4579434" />
+<img width="1919" height="977" alt="image" src="https://github.com/user-attachments/assets/473d1464-604e-4e5f-ae16-46c93f81f7de" />
 
 ---
 
@@ -189,14 +188,17 @@ This README provides step-by-step instructions to set up **Jenkins CI/CD pipelin
 
 ```bash
 sudo apt update
-sudo apt install openjdk-21-jdk -y
+sudo apt install fontconfig openjdk-21-jre
 
-wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
 
 sudo apt update
-sudo apt install jenkins -y
 
+sudo apt install jenkins
 # Start and enable Jenkins
 sudo systemctl start jenkins
 sudo systemctl enable jenkins
@@ -327,7 +329,7 @@ Navigate to: `Manage Jenkins → Credentials → System → Global credentials �
 1. Click **New Item → Pipeline → OK**
 2. Pipeline → Definition → Pipeline script from SCM
 
-<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/3b31a82e-92bf-4c25-82a3-e037fe2a36a8" />
+<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/cd726b81-6d2f-4929-9d50-40e132a2b50f" />
 
 ---
 
@@ -411,7 +413,7 @@ pipeline {
 
 This pipeline provides a **fully automated CI/CD process** for the MEAN stack application with **Docker and Jenkins**
 
-<img width="1919" height="1016" alt="image" src="https://github.com/user-attachments/assets/4d222ae4-798e-4fbe-9a93-154ccda4db22" />
+<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/590a840a-11b6-4546-b524-20ebe4c16f82" />
 
 
 
@@ -431,15 +433,20 @@ Open your browser and go to `http://<EC2-IP>` to verify that:
 
 ##Output:
 
-<img width="1919" height="968" alt="Screenshot 2025-11-28 170623" src="https://github.com/user-attachments/assets/72b68920-bd9c-478b-8a4a-7d5d53c0a30a" />
+<img width="1919" height="1018" alt="Screenshot 2025-12-01 211335" src="https://github.com/user-attachments/assets/79c3278b-e04a-4bfe-9612-db5eb91129b0" />
 
-<img width="1919" height="968" alt="Screenshot 2025-11-28 170723" src="https://github.com/user-attachments/assets/daf9f98b-e388-486f-9687-c099e90160b8" />
 
-<img width="1916" height="968" alt="Screenshot 2025-11-28 170744" src="https://github.com/user-attachments/assets/eb53de5d-ce46-452d-bc1f-7ec713848ee6" />
+<img width="1919" height="1019" alt="Screenshot 2025-12-01 211343" src="https://github.com/user-attachments/assets/92e7665d-69d9-407e-affe-60d8978409f1" />
 
-<img width="1919" height="974" alt="Output-4" src="https://github.com/user-attachments/assets/6cd66d2a-906b-4271-b838-c565a446be4b" />
 
-<img width="1919" height="971" alt="Output-5" src="https://github.com/user-attachments/assets/69a215f4-c033-403d-b1c8-8ffba86992b5" />
+<img width="1919" height="1019" alt="Screenshot 2025-12-01 211400" src="https://github.com/user-attachments/assets/47dedb17-24a7-466c-8a76-5e6c860a8922" />
+
+
+<img width="1918" height="1018" alt="Screenshot 2025-12-01 211414" src="https://github.com/user-attachments/assets/38d9759e-e9cd-4182-a38c-1eaae68d59d5" />
+
+
+<img width="1919" height="1020" alt="Screenshot 2025-12-01 211456" src="https://github.com/user-attachments/assets/8cd7ebdc-29d2-49e4-9d83-847b290c242d" />
+
 
 <img width="1919" height="968" alt="image" src="https://github.com/user-attachments/assets/6ad0c13b-becf-4f8f-85cb-d46246d817ad" />
 
