@@ -2,10 +2,6 @@
 
 This repository contains a **full-stack MEAN (MongoDB, Express, Angular, Node.js) application** deployed using Docker on AWS. This setup was implemented as part of the **DevOps Engineer Intern Assignment**.
 
----
-Website URL - http://3.236.13.12/
----
-
 # Jenkins CI/CD Pipeline for MEAN App Deployment
 
 <img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/590a840a-11b6-4546-b524-20ebe4c16f82" />
